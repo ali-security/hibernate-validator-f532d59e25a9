@@ -1,0 +1,30 @@
+name: seal-build
+
+# Build-and-pack only: the test suite runs on Travis (.travis.yml).
+on:
+  workflow_dispatch: {}
+
+jobs:
+  pack:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 8 with JavaFX (Zulu 8 FX)
+        uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: '8'
+          java-package: jdk+fx
+      - name: Install Maven 3.9.5
+        run: |
+          curl -fsSL --retry 5 --retry-delay 5 -o /tmp/maven.tar.gz https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.9.5/apache-maven-3.9.5-bin.tar.gz
+          mkdir -p "$HOME/maven395" && tar -xzf /tmp/maven.tar.gz -C "$HOME/maven395" --strip-components=1
+          echo "$HOME/maven395/bin" >> "$GITHUB_PATH"
+      - name: Build hibernate-validator jar
+        run: mvn -B -ntp -Dcheckstyle.skip -Dlicense.skip -Dforbiddenapis.skip -DskipTests -pl engine -am clean install
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hibernate-validator-jar
+          path: engine/target/hibernate-validator-6.1.6.Final.jar
+          if-no-files-found: error
