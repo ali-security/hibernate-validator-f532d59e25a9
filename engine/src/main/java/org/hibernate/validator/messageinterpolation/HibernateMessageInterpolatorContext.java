@@ -48,4 +48,18 @@ public interface HibernateMessageInterpolatorContext extends MessageInterpolator
 	 * @since 6.1
 	 */
 	Path getPropertyPath();
+
+	/**
+	 * Returns the level of features enabled for the Expression Language engine.
+	 * <p>
+	 * Implementations not providing a level are treated like a plain {@code MessageInterpolator.Context}, i.e. the
+	 * {@link ExpressionLanguageFeatureLevel#VARIABLES} level is used.
+	 *
+	 * @return the level of features enabled for the Expression Language engine
+	 *
+	 * @since 6.2
+	 */
+	default ExpressionLanguageFeatureLevel getExpressionLanguageFeatureLevel() {
+		return ExpressionLanguageFeatureLevel.VARIABLES;
+	}
 }

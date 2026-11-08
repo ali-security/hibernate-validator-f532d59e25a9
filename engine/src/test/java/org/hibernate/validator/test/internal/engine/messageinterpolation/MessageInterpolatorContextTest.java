@@ -8,6 +8,7 @@
 package org.hibernate.validator.test.internal.engine.messageinterpolation;
 
 import org.hibernate.validator.internal.engine.MessageInterpolatorContext;
+import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 import org.hibernate.validator.messageinterpolation.HibernateMessageInterpolatorContext;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
@@ -92,7 +93,9 @@ public class MessageInterpolatorContextTest {
 								TestBean.class,
 								null,
 								Collections.<String, Object>emptyMap(),
-								Collections.<String, Object>emptyMap() )
+								Collections.<String, Object>emptyMap(),
+								ExpressionLanguageFeatureLevel.BEAN_METHODS,
+								false )
 				)
 		)
 				.andReturn( "invalid" );
@@ -109,13 +112,15 @@ public class MessageInterpolatorContextTest {
 
 	@Test(expectedExceptions = ValidationException.class)
 	public void testUnwrapToImplementationCausesValidationException() {
-		Context context = new MessageInterpolatorContext( null, null, null, null, Collections.<String, Object>emptyMap(), Collections.<String, Object>emptyMap() );
+		Context context = new MessageInterpolatorContext( null, null, null, null, Collections.<String, Object>emptyMap(),
+				Collections.<String, Object>emptyMap(), ExpressionLanguageFeatureLevel.BEAN_METHODS, false );
 		context.unwrap( MessageInterpolatorContext.class );
 	}
 
 	@Test
 	public void testUnwrapToInterfaceTypesSucceeds() {
-		Context context = new MessageInterpolatorContext( null, null, null, null, Collections.<String, Object>emptyMap(), Collections.<String, Object>emptyMap() );
+		Context context = new MessageInterpolatorContext( null, null, null, null, Collections.<String, Object>emptyMap(),
+				Collections.<String, Object>emptyMap(), ExpressionLanguageFeatureLevel.BEAN_METHODS, false );
 
 		MessageInterpolator.Context asMessageInterpolatorContext = context.unwrap( MessageInterpolator.Context.class );
 		assertSame( asMessageInterpolatorContext, context );
@@ -138,7 +143,9 @@ public class MessageInterpolatorContextTest {
 				rootBeanType,
 				null,
 				Collections.<String, Object>emptyMap(),
-				Collections.<String, Object>emptyMap() );
+				Collections.<String, Object>emptyMap(),
+				ExpressionLanguageFeatureLevel.BEAN_METHODS,
+				false );
 
 		assertSame( context.unwrap( HibernateMessageInterpolatorContext.class ).getRootBeanType(), rootBeanType );
 	}
@@ -153,7 +160,9 @@ public class MessageInterpolatorContextTest {
 				null,
 				pathMock,
 				Collections.<String, Object>emptyMap(),
-				Collections.<String, Object>emptyMap() );
+				Collections.<String, Object>emptyMap(),
+				ExpressionLanguageFeatureLevel.BEAN_METHODS,
+				false );
 
 		assertSame( context.unwrap( HibernateMessageInterpolatorContext.class ).getPropertyPath(), pathMock );
 	}

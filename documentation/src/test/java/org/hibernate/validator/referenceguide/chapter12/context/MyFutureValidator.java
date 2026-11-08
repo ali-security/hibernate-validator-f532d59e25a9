@@ -33,6 +33,7 @@ public class MyFutureValidator implements ConstraintValidator<Future, Instant> {
 			hibernateContext
 					.addExpressionVariable( "now", now )
 					.buildConstraintViolationWithTemplate( "Must be after ${now}" )
+					.enableExpressionLanguage()
 					.addConstraintViolation();
 
 			return false;

@@ -12,9 +12,11 @@ import javax.validation.ClockProvider;
 import javax.validation.ElementKind;
 import javax.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.constraintvalidation.HibernateConstraintViolationBuilder;
 import org.hibernate.validator.constraintvalidation.HibernateCrossParameterConstraintValidatorContext;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 
 /**
  * @author Marko Bekhta
@@ -23,14 +25,21 @@ public class CrossParameterConstraintValidatorContextImpl extends ConstraintVali
 
 	private final List<String> methodParameterNames;
 
-	public CrossParameterConstraintValidatorContextImpl(List<String> methodParameterNames, ClockProvider clockProvider, PathImpl propertyPath, ConstraintDescriptor<?> constraintDescriptor, Object constraintValidatorPayload) {
-		super( clockProvider, propertyPath, constraintDescriptor, constraintValidatorPayload );
+	public CrossParameterConstraintValidatorContextImpl(List<String> methodParameterNames,
+			ClockProvider clockProvider,
+			PathImpl propertyPath,
+			ConstraintDescriptor<?> constraintDescriptor,
+			Object constraintValidatorPayload,
+			ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel,
+			ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel) {
+		super( clockProvider, propertyPath, constraintDescriptor, constraintValidatorPayload, constraintExpressionLanguageFeatureLevel,
+				customViolationExpressionLanguageFeatureLevel );
 		Contracts.assertTrue( propertyPath.getLeafNode().getKind() == ElementKind.CROSS_PARAMETER, "Context can only be used for corss parameter validation" );
 		this.methodParameterNames = methodParameterNames;
 	}
 
 	@Override
-	public final ConstraintViolationBuilder buildConstraintViolationWithTemplate(String messageTemplate) {
+	public final HibernateConstraintViolationBuilder buildConstraintViolationWithTemplate(String messageTemplate) {
 		return new CrossParameterConstraintViolationBuilderImpl(
 				methodParameterNames,
 				messageTemplate,
@@ -66,7 +75,7 @@ public class CrossParameterConstraintValidatorContextImpl extends ConstraintVali
 			dropLeafNode();
 			propertyPath.addParameterNode( methodParameterNames.get( index ), index );
 
-			return new NodeBuilder( messageTemplate, propertyPath );
+			return new NodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath );
 		}
 
 		private void dropLeafNode() {

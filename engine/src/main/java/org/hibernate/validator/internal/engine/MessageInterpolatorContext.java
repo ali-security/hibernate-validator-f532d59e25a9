@@ -17,6 +17,7 @@ import javax.validation.metadata.ConstraintDescriptor;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
+import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 import org.hibernate.validator.messageinterpolation.HibernateMessageInterpolatorContext;
 
 /**
@@ -39,19 +40,25 @@ public class MessageInterpolatorContext implements HibernateMessageInterpolatorC
 	private final Map<String, Object> messageParameters;
 	@Immutable
 	private final Map<String, Object> expressionVariables;
+	private final ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel;
+	private final boolean customViolation;
 
 	public MessageInterpolatorContext(ConstraintDescriptor<?> constraintDescriptor,
 					Object validatedValue,
 					Class<?> rootBeanType,
 					Path propertyPath,
 					Map<String, Object> messageParameters,
-					Map<String, Object> expressionVariables) {
+					Map<String, Object> expressionVariables,
+					ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel,
+					boolean customViolation) {
 		this.constraintDescriptor = constraintDescriptor;
 		this.validatedValue = validatedValue;
 		this.rootBeanType = rootBeanType;
 		this.propertyPath = propertyPath;
 		this.messageParameters = toImmutableMap( messageParameters );
 		this.expressionVariables = toImmutableMap( expressionVariables );
+		this.expressionLanguageFeatureLevel = expressionLanguageFeatureLevel;
+		this.customViolation = customViolation;
 	}
 
 	@Override
@@ -72,6 +79,15 @@ public class MessageInterpolatorContext implements HibernateMessageInterpolatorC
 	@Override
 	public Map<String, Object> getMessageParameters() {
 		return messageParameters;
+	}
+
+	@Override
+	public ExpressionLanguageFeatureLevel getExpressionLanguageFeatureLevel() {
+		return expressionLanguageFeatureLevel;
+	}
+
+	public boolean isCustomViolation() {
+		return customViolation;
 	}
 
 	@Override
@@ -135,6 +151,8 @@ public class MessageInterpolatorContext implements HibernateMessageInterpolatorC
 		sb.append( ", propertyPath=" ).append( propertyPath );
 		sb.append( ", messageParameters=" ).append( messageParameters );
 		sb.append( ", expressionVariables=" ).append( expressionVariables );
+		sb.append( ", expressionLanguageFeatureLevel=" ).append( expressionLanguageFeatureLevel );
+		sb.append( ", customViolation=" ).append( customViolation );
 		sb.append( '}' );
 		return sb.toString();
 	}
